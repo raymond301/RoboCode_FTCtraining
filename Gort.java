@@ -15,13 +15,15 @@ public class Gort extends Robot
 	String enemyRobotName;
 	boolean keepSearching = true;
 	int pwr = 1;
+	DirectionDriveSupport driver = new DirectionDriveSupport();
 
 	public void run() {
 		// Initialization of the robot
 		enemyRobotName = null; // Initialy to not following anyone
 		setColors(Color.blue,Color.blue,Color.blue); // body,gun,radar
 		int count = 0;
-		
+		dynamicDrive(driver.getDirections(), driver.getDistances());
+
 		// Robot main loop
 		while(true) {
 			// Replace the next 4 lines with any behavior you would like
@@ -134,9 +136,3 @@ public class Gort extends Robot
 	
 }
 
-
-//public class DirectionDriveSupport
-//{
-	
-//}
-//}
