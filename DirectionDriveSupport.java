@@ -1,5 +1,7 @@
 package raymondBots;
 
+import java.util.HashMap;
+
 /**
  * MyClass - a class by (your name here)
  */
@@ -7,6 +9,7 @@ public class DirectionDriveSupport
 {
 	private char[] directionArr;	
 	private int[] distanceArr;
+
 	
 	public DirectionDriveSupport(){
 		directionArr = new char[]{'a'};
@@ -27,3 +30,38 @@ public class DirectionDriveSupport
 
 }
 
+//class RecordCollection{
+//	HashMap<String, EnemyBotRecord> allBotList = new HashMap<>();
+//}
+
+class EnemyBotRecord {
+	public String name; // bot name
+	public double life;
+	public double distance;
+	public double bearing;
+	public int dangerLevel = 0; //rank toughness of enemy bot
+
+	public EnemyBotRecord(String n, double l, double d, double b){
+		name = n;
+		life = l;
+		distance = d;
+		bearing = b;
+
+		// Attempt to categorize this enemy bot
+		if (life > 99){
+			dangerLevel = 3;
+		}
+		else if( life > 50 && distance < 120){
+			dangerLevel = 2;
+		}
+		else if( life < 50 ){
+			dangerLevel = 1;
+		}
+
+	}
+
+	public String toString(){
+		return "Name: "+name+", Energy: "+life+" Dist: "+distance+" Br: "+bearing+" Danger: "+dangerLevel;
+	}
+
+}

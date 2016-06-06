@@ -3,34 +3,32 @@ import robocode.*;
 import java.awt.Color;
 
 // API help : http://robocode.sourceforge.net/docs/robocode/robocode/Robot.html
-
 /**
- * Gort - a robot by (your name here)
+ * Gort - a robot by Jedi Master Raymond
  */
 public class Gort extends Robot
 {
 	/**
-	 * run: Gort's default behavior
+	 * run: Gort wants to seek out enemies and destoy them one at a time. Pretty agressive style robot.
 	 */
-	String enemyRobotName;
 	boolean keepSearching = true;
 	int pwr = 1;
 	DirectionDriveSupport driver = new DirectionDriveSupport();
 
 	public void run() {
 		// Initialization of the robot
-		enemyRobotName = null; // Initialy to not following anyone
 		setColors(Color.blue,Color.blue,Color.blue); // body,gun,radar
 		int count = 0;
 		dynamicDrive(driver.getDirections(), driver.getDistances());
 
 		// Robot main loop
 		while(true) {
-			// Replace the next 4 lines with any behavior you would like
-			//ahead(100);
-			//turnGunRight(360);
-			//back(100);
-			//turnGunRight(66);
+			// Visually display myself white, when I am getting low on energy
+			if(getEnergy() < 30){
+				setColors(Color.white,Color.white,Color.blue); // body,gun,radar
+			}		
+
+
 			if(keepSearching){
 				turnRight(66);
 				ahead(10);
@@ -49,11 +47,6 @@ public class Gort extends Robot
 					System.out.println("Break out Count");	
 				}
 			}
-
-			
-			if(getEnergy() < 30){
-				setColors(Color.white,Color.white,Color.blue); // body,gun,radar
-			}
 			count++;
 		}
 	}
@@ -62,8 +55,8 @@ public class Gort extends Robot
 	 * onScannedRobot: What to do when you see another robot
 	 */
 	public void onScannedRobot(ScannedRobotEvent e) {
-		enemyRobotName = e.getName();
-		out.println("Found: " + enemyRobotName + " Dist: " + e.getDistance() + "Bearing: " + e.getBearing());	
+		EnemyBotRecord ebr = new EnemyBotRecord(e.getName(),e.getEnergy(),e.getDistance(),e.getBearing());
+		out.println( ebr.toString() );	
 
 		// Chase them down!!
 		if(e.getDistance() > 30){
@@ -72,14 +65,14 @@ public class Gort extends Robot
 			ahead(e.getDistance() - 50);
 		}
 		
-		if( e.getDistance() < 40 ){
+		if( ebr.dangerLevel == 3 ){
 			fire(4);
 			pwr = 4;
 		}
-		else if( e.getDistance() < 100 ){
+		else if( ebr.dangerLevel == 2 ){
 			fire(2);
 		}
-		else if( e.getDistance() < 300 ){
+		else if( ebr.dangerLevel == 1 ){
 			pwr = 1;
 		} 
 		else{
@@ -95,7 +88,8 @@ public class Gort extends Robot
 		double fromDirection = e.getBearing(); 
 		if( fromDirection > -10 && fromDirection < 10 ){
 			System.out.println("Direct Front");
-			dynamicDrive(new char[]{'r','a','l'}, new int[]{90,15,90} );	
+			driver.evadeFrontalHits();
+			dynamicDrive(driver.getDirections(), driver.getDistances());
 		}
 		else{
 			back(10);
@@ -111,16 +105,25 @@ public class Gort extends Robot
 		back(20);
 	}	
 	
+	/**
+	 * onBulletHit: What to do when get hit by someone else
+	 */
 	public void onBulletHit(BulletHitEvent e){
 		System.out.println("onBulletHit!");	
 		keepSearching=false;
 	}
 	
+	/**
+	 * onBulletMissed: What to do when you miss, and hit a wall instead
+	 */
 	public void onBulletMissed(BulletHitEvent e){
 		System.out.println("onBulletMissed!");	
 		keepSearching=true;
 	}
 	
+	/**
+	 * dynamicDrive: accept a list of actions to take in series
+	 */
 	public void dynamicDrive(char[] directions, int[] distances){
 		for(int i=0; i < directions.length; i++){
 			switch(directions[i]){
