@@ -31,7 +31,8 @@ public class Gort extends Robot
 			//turnGunRight(66);
 			if(keepSearching){
 				turnRight(66);
-				ahead(10);		
+				ahead(10);
+				System.out.println("Keep Searching");	
 			}
 			else{
 				if(pwr > 0){
@@ -41,7 +42,9 @@ public class Gort extends Robot
 					count = 0;
 					pwr = 0;
 					keepSearching = true;
-					back(50);
+					dynamicDrive(new char[]{'b'}, new int[]{50});
+					//back(50);
+					System.out.println("Break out Count");	
 				}
 			}
 
@@ -62,6 +65,7 @@ public class Gort extends Robot
 
 		// Chase them down!!
 		if(e.getDistance() > 30){
+			System.out.println("Chase Down:"+e.getDistance());
 			turnRight(e.getBearing());
 			ahead(e.getDistance() - 50);
 		}
@@ -88,9 +92,8 @@ public class Gort extends Robot
 		// Check to see if I'm getting hit from straight on?
 		double fromDirection = e.getBearing(); 
 		if( fromDirection > -10 && fromDirection < 10 ){
-			turnRight(90);
-			ahead(15);
-			turnLeft(90);
+			System.out.println("Direct Front");
+			dynamicDrive(new char[]{'r','a','l'}, new int[]{90,15,90} );	
 		}
 		else{
 			back(10);
@@ -102,16 +105,38 @@ public class Gort extends Robot
 	 */
 	public void onHitWall(HitWallEvent e) {
 		// Replace the next line with any behavior you would like
+		System.out.println("Wall!");	
 		back(20);
 	}	
 	
 	public void onBulletHit(BulletHitEvent e){
+		System.out.println("onBulletHit!");	
 		keepSearching=false;
 	}
 	
-		public void onBulletMissed(BulletHitEvent e){
+	public void onBulletMissed(BulletHitEvent e){
+		System.out.println("onBulletMissed!");	
 		keepSearching=true;
-	}	
+	}
+	
+	public void dynamicDrive(char[] directions, int[] distances){
+		for(int i=0; i < directions.length; i++){
+			switch(directions[i]){
+				case 'a': ahead(distances[i]);
+				case 'b': back(distances[i]);
+				case 'l': turnLeft(distances[i]);
+				case 'r': turnRight(distances[i]);
+			}
+		}
+			
+	}
 
-
+	
 }
+
+
+//public class DirectionDriveSupport
+//{
+	
+//}
+//}
