@@ -17,7 +17,8 @@ public class Gort extends Robot
 
 	public void run() {
 		// Initialization of the robot
-		setColors(Color.blue,Color.blue,Color.blue); // body,gun,radar
+		setColors(Color.blue,Color.blue,Color.blue,Color.blue,Color.yellow); // body,gun,radar,bullet,scan ar
+		// SetScanColor(Color.White);
 		int count = 0;
 		dynamicDrive(driver.getDirections(), driver.getDistances());
 

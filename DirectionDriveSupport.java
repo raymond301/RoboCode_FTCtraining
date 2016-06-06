@@ -30,9 +30,17 @@ public class DirectionDriveSupport
 
 }
 
-//class RecordCollection{
-//	HashMap<String, EnemyBotRecord> allBotList = new HashMap<>();
-//}
+class RecordCollection{
+	HashMap<String, EnemyBotRecord> allBotList;
+
+	public RecordCollection(){
+		allBotList = new HashMap<>();
+	}
+
+	public void addRecord( EnemyBotRecord e ){
+
+	}
+}
 
 class EnemyBotRecord {
 	public String name; // bot name
