@@ -10,17 +10,27 @@ public class DirectionDriveSupport
 	private char[] directionArr;	
 	private int[] distanceArr;
 	private RecordCollection botRecords;
+	private int width = 1;
+	private int halfwidth = 1;
+	private int hieght = 1;
+	private int halfhieght = 1;
+	private int myX = 1;
+	private int myY = 1;
+	/**
+	 * 	   the Field
+	 *   |  2  |  4  |
+	 *   |  1  |  3  |
+	 */
+	private int myQuadrant; //LowerLeft=1, UpperLeft=2, LowerRight=3, UpperRight=4
 
-	
+
+	/**
+	 *  Support Constructor
+	 */
 	public DirectionDriveSupport(){
 		directionArr = new char[]{'a'};
 		distanceArr = new int[]{20};
-	}
-
-	public DirectionDriveSupport(RecordCollection rc){
-		directionArr = new char[]{'a'};
-		distanceArr = new int[]{20};
-		botRecords = rc;
+		botRecords = new RecordCollection();
 	}
 
 	public char[] getDirections(){
@@ -28,7 +38,39 @@ public class DirectionDriveSupport
 	}
 	public int[] getDistances(){
 		return distanceArr;
-	}	
+	}
+
+	// [0,0] is the lower left corner
+	public void myField( double w, double h){
+		width = (int) w;
+		hieght = (int) h;
+		halfwidth = width / 2;
+		halfhieght = hieght /2;
+	}
+
+	// [0,0] is the lower left corner
+	public void myPosition( double x, double y){
+		myX = (int) x;
+		myY = (int) y;
+		myQuadrant = calculateQuadrant(myX,myY);
+	}
+
+	private int calculateQuadrant(int x, int y){
+		int currentQuadrant = 0;
+		if( x < halfwidth && y < halfhieght ){
+			currentQuadrant = 1;
+		}
+		else if( x > halfwidth && y < halfhieght ){
+			currentQuadrant = 3;
+		}
+		else if( x < halfwidth && y > halfhieght ){
+			currentQuadrant = 2;
+		}
+		else if( x > halfwidth && y > halfhieght ){
+			currentQuadrant = 4;
+		}
+		return currentQuadrant;
+	}
 
 	public void evadeFrontalHits(String name){
 		// use scan information to decide to attack or run.
@@ -36,6 +78,9 @@ public class DirectionDriveSupport
 		distanceArr = new int[]{90,30,85};
 	}
 
+	public String getLocationString(){
+		return "X:"+myX+" Y:"+myY+" Quad:"+myQuadrant;
+	}
 }
 
 class RecordCollection{

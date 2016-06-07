@@ -13,43 +13,25 @@ public class Gort extends Robot
 	 */
 	boolean keepSearching = true;
 	int pwr = 1;
-	RecordCollection botList = new RecordCollection();
-	DirectionDriveSupport driver = new DirectionDriveSupport(botList);
+	DirectionDriveSupport driver = new DirectionDriveSupport();
 
 	public void run() {
 		// Initialization of the robot
 		setAllColors(Color.blue); // body,gun,radar,bullet,scan ar
-
-		int count = 0;
-		dynamicDrive(driver.getDirections(), driver.getDistances());
+		driver.myField(getBattleFieldWidth(), getBattleFieldHeight());
+		System.out.println("FieldWidth: "+getBattleFieldWidth()+"  FieldHeight:"+getBattleFieldHeight());
+		driver.myPosition(getX(),getY());
+		//dynamicDrive(driver.getDirections(), driver.getDistances());
 
 		// Robot main loop
 		while(true) {
+			driver.myPosition(getX(),getY());
 			// Visually display myself white, when I am getting low on energy
 			if(getEnergy() < 30){
 				setColors(Color.white,Color.white,Color.blue); // body,gun,radar
-			}		
-
-
-			if(keepSearching){
-				turnRight(66);
-				ahead(10);
-				System.out.println("Keep Searching");	
 			}
-			else{
-				if(pwr > 0){
-					fire(pwr);
-				}
-				if(count > 50){
-					count = 0;
-					pwr = 0;
-					keepSearching = true;
-					dynamicDrive(new char[]{'b'}, new int[]{50});
-					//back(50);
-					System.out.println("Break out Count");	
-				}
-			}
-			count++;
+			ahead(300);
+			System.out.println(driver.getLocationString());
 		}
 	}
 
@@ -58,7 +40,7 @@ public class Gort extends Robot
 	 */
 	public void onScannedRobot(ScannedRobotEvent e) {
 		EnemyBotRecord ebr = new EnemyBotRecord(e.getName(),e.getEnergy(),e.getDistance(),e.getBearing());
-		out.println( ebr.toString() );	
+		out.println(ebr.toString());
 
 		// Chase them down!!
 		if(e.getDistance() > 30){
@@ -106,6 +88,7 @@ public class Gort extends Robot
 		// Replace the next line with any behavior you would like
 		System.out.println("Wall!");	
 		back(20);
+		turnLeft(150);
 	}	
 	
 	/**
