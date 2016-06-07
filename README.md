@@ -6,11 +6,12 @@ Programming for FTC requires a working knowledge of Java. To help us practice we
 
 Rank | RobotName | TotalScore | BulletDmg | 1sts | 2nds
 --- | --- | --- | --- | --- | ---
-1st | sample.Walls | 3181(54%) | 1170 | 10 | 0
-2nd | sample.SpinBot | 1131(19%) | 674 | 0 | 2
-3rd | raymondBots.Gort* | 799(14%) | 104 | 0 | 6
-4th | sample.Crazy | 770(13%) | 236 | 0 | 2
- 
+1st | sample.Walls | 2995(48%%) | 1011 | 10 | 0
+2nd | sample.SpinBot | 1759(28%) | 994 | 0 | 3
+3rd | sample.Crazy | 1179(19%) | 336 | 0 | 7
+4th | raymondBots.Gort* | 263(4%) | 122 | 0 | 0
+
+ Doing Worse than previous Record: 14% Total Score
   
 ## Getting Started
 As we know, setup can be tricky...but guess what...there is a video to help you:

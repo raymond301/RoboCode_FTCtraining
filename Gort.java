@@ -13,12 +13,13 @@ public class Gort extends Robot
 	 */
 	boolean keepSearching = true;
 	int pwr = 1;
-	DirectionDriveSupport driver = new DirectionDriveSupport();
+	RecordCollection botList = new RecordCollection();
+	DirectionDriveSupport driver = new DirectionDriveSupport(botList);
 
 	public void run() {
 		// Initialization of the robot
-		setColors(Color.blue,Color.blue,Color.blue,Color.blue,Color.yellow); // body,gun,radar,bullet,scan ar
-		// SetScanColor(Color.White);
+		setAllColors(Color.blue); // body,gun,radar,bullet,scan ar
+
 		int count = 0;
 		dynamicDrive(driver.getDirections(), driver.getDistances());
 
@@ -66,14 +67,14 @@ public class Gort extends Robot
 			ahead(e.getDistance() - 50);
 		}
 		
-		if( ebr.dangerLevel == 3 ){
+		if( ebr.dangerLevel == 1 ){
 			fire(4);
 			pwr = 4;
 		}
 		else if( ebr.dangerLevel == 2 ){
 			fire(2);
 		}
-		else if( ebr.dangerLevel == 1 ){
+		else if( ebr.dangerLevel == 3 ){
 			pwr = 1;
 		} 
 		else{
@@ -89,7 +90,8 @@ public class Gort extends Robot
 		double fromDirection = e.getBearing(); 
 		if( fromDirection > -10 && fromDirection < 10 ){
 			System.out.println("Direct Front");
-			driver.evadeFrontalHits();
+			
+			driver.evadeFrontalHits(e.getName());
 			dynamicDrive(driver.getDirections(), driver.getDistances());
 		}
 		else{
@@ -111,7 +113,7 @@ public class Gort extends Robot
 	 */
 	public void onBulletHit(BulletHitEvent e){
 		System.out.println("onBulletHit!");	
-		keepSearching=false;
+		//keepSearching=false;
 	}
 	
 	/**

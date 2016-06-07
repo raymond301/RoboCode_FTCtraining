@@ -9,11 +9,18 @@ public class DirectionDriveSupport
 {
 	private char[] directionArr;	
 	private int[] distanceArr;
+	private RecordCollection botRecords;
 
 	
 	public DirectionDriveSupport(){
 		directionArr = new char[]{'a'};
 		distanceArr = new int[]{20};
+	}
+
+	public DirectionDriveSupport(RecordCollection rc){
+		directionArr = new char[]{'a'};
+		distanceArr = new int[]{20};
+		botRecords = rc;
 	}
 
 	public char[] getDirections(){
@@ -23,7 +30,8 @@ public class DirectionDriveSupport
 		return distanceArr;
 	}	
 
-	public void evadeFrontalHits(){
+	public void evadeFrontalHits(String name){
+		// use scan information to decide to attack or run.
 		directionArr = new char[]{'r','b','l'};
 		distanceArr = new int[]{90,30,85};
 	}
@@ -37,8 +45,14 @@ class RecordCollection{
 		allBotList = new HashMap<>();
 	}
 
-	public void addRecord( EnemyBotRecord e ){
-
+	public void checkRecord( String n, double l, double d, double b ){
+		EnemyBotRecord now = allBotList.get(n);
+		if (now != null) {
+			allBotList.put(n, new EnemyBotRecord(n,l,d,b));
+		}
+		else{
+			now.updateAll(l,d,b);
+		}
 	}
 }
 
@@ -48,6 +62,7 @@ class EnemyBotRecord {
 	public double distance;
 	public double bearing;
 	public int dangerLevel = 0; //rank toughness of enemy bot
+	public int consecutiveScan = 0;
 
 	public EnemyBotRecord(String n, double l, double d, double b){
 		name = n;
@@ -62,10 +77,16 @@ class EnemyBotRecord {
 		else if( life > 50 && distance < 120){
 			dangerLevel = 2;
 		}
-		else if( life < 50 ){
+		else if( life < 50 || distance < 55){
 			dangerLevel = 1;
 		}
 
+	}
+
+	public void updateAll(double l, double d, double b){
+		life = l;
+		distance = d;
+		bearing = b;
 	}
 
 	public String toString(){
