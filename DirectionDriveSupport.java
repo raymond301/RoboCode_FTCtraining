@@ -33,13 +33,23 @@ public class DirectionDriveSupport
 		botRecords = new RecordCollection();
 	}
 
+	/**
+	 *  Getters - Methods to get information
+	 */
 	public char[] getDirections(){
 		return directionArr;
 	}
 	public int[] getDistances(){
 		return distanceArr;
 	}
+	public String getLocationString(){
+		return "X:"+myX+" Y:"+myY+" Quad:"+myQuadrant;
+	}
 
+
+	/**
+	 * Setters - Methods to give information, with nothing in return
+	 */
 	// [0,0] is the lower left corner
 	public void myField( double w, double h){
 		width = (int) w;
@@ -55,6 +65,16 @@ public class DirectionDriveSupport
 		myQuadrant = calculateQuadrant(myX,myY);
 	}
 
+	public void evadeFrontalHits(String name){
+		// use scan information to decide to attack or run.
+		directionArr = new char[]{'r','b','l'};
+		distanceArr = new int[]{90,30,85};
+	}
+
+
+	/**
+	 * Private Methods - Only available in this class
+	 */
 	private int calculateQuadrant(int x, int y){
 		int currentQuadrant = 0;
 		if( x < halfwidth && y < halfhieght ){
@@ -72,15 +92,6 @@ public class DirectionDriveSupport
 		return currentQuadrant;
 	}
 
-	public void evadeFrontalHits(String name){
-		// use scan information to decide to attack or run.
-		directionArr = new char[]{'r','b','l'};
-		distanceArr = new int[]{90,30,85};
-	}
-
-	public String getLocationString(){
-		return "X:"+myX+" Y:"+myY+" Quad:"+myQuadrant;
-	}
 }
 
 class RecordCollection{
