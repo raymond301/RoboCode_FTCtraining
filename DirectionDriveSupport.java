@@ -1,6 +1,7 @@
 package raymondBots;
 
 import java.util.HashMap;
+import java.util.Set;
 
 /**
  * MyClass - a class by (your name here)
@@ -16,6 +17,11 @@ public class DirectionDriveSupport
 	private int halfhieght = 1;
 	private int myX = 1;
 	private int myY = 1;
+	private EnemyBotRecord lastScannedBot;
+	private EnemyBotRecord attackTarget;
+	private int consecutiveScan = 0;
+	private boolean drive = false;
+	private boolean shoot = false;
 	/**
 	 * 	   the Field
 	 *   |  2  |  4  |
@@ -29,23 +35,38 @@ public class DirectionDriveSupport
 	 */
 	public DirectionDriveSupport(){
 		directionArr = new char[]{'a'};
-		distanceArr = new int[]{20};
+		distanceArr = new int[]{5};
 		botRecords = new RecordCollection();
 	}
 
 	/**
 	 *  Getters - Methods to get information
 	 */
+	public String getCourseComing(){
+		String out = "";
+		for(int i=0; i < directionArr.length; i++){
+			out = out+directionArr[i]+":"+distanceArr[i]+", ";
+		}
+		return out;
+	}
 	public char[] getDirections(){
 		return directionArr;
 	}
 	public int[] getDistances(){
 		return distanceArr;
 	}
+	public boolean getDriveDesion(){
+		return drive;
+	}
+	public boolean getShootingDesion(){
+		return shoot;
+	}
 	public String getLocationString(){
 		return "X:"+myX+" Y:"+myY+" Quad:"+myQuadrant;
 	}
-
+	public String getMySeenBots(){
+		return botRecords.showAllRobotNames();
+	}
 
 	/**
 	 * Setters - Methods to give information, with nothing in return
@@ -64,11 +85,39 @@ public class DirectionDriveSupport
 		myY = (int) y;
 		myQuadrant = calculateQuadrant(myX,myY);
 	}
-
+	public void turnOffShooting(){
+		shoot = false;
+	}
 	public void evadeFrontalHits(String name){
 		// use scan information to decide to attack or run.
 		directionArr = new char[]{'r','b','l'};
 		distanceArr = new int[]{90,30,85};
+	}
+
+	public void scannedARobot(String n, double l, double d, double b){
+		System.out.println(n+" cnt="+botRecords.size());
+		botRecords.checkRecord(n,l,d,b);
+		// First round, there is no last bot...need to set it.
+		if(lastScannedBot == null){
+			lastScannedBot = botRecords.getBotByName(n);
+		}
+		else{
+			if(n.equals(lastScannedBot.name)){
+				consecutiveScan++;
+			}
+			else{
+				consecutiveScan = 0;
+				lastScannedBot = botRecords.getBotByName(n);
+			}
+		}
+
+		if(attackTarget == null){
+			attackTarget = botRecords.getBotByName(n);
+		}
+
+	}
+	public void robotDemise(String name){
+		botRecords.drop(name);
 	}
 
 
@@ -92,8 +141,18 @@ public class DirectionDriveSupport
 		return currentQuadrant;
 	}
 
+	private EnemyBotRecord calculateTarget(){
+		if(botRecords.size() == 1){
+			return botRecords.getOne();
+		}
+	}
+
 }
 
+
+/**
+ *  THIS IS JUST A LIST OF ROBOTS
+ */
 class RecordCollection{
 	HashMap<String, EnemyBotRecord> allBotList;
 
@@ -101,48 +160,76 @@ class RecordCollection{
 		allBotList = new HashMap<>();
 	}
 
+	public EnemyBotRecord getBotByName(String n){
+		return allBotList.get(n);
+	}
+	public EnemyBotRecord getOne(){
+		String ns = allBotList.keySet().iterator().next();
+		return allBotList.get(ns);
+	}
+	public void drop(String n){
+		allBotList.remove(n);
+	}
 	public void checkRecord( String n, double l, double d, double b ){
+		//System.out.println("Inside: checkRecord. Name="+n);
 		EnemyBotRecord now = allBotList.get(n);
-		if (now != null) {
+		if (now == null) {
 			allBotList.put(n, new EnemyBotRecord(n,l,d,b));
 		}
 		else{
 			now.updateAll(l,d,b);
 		}
 	}
+
+	public String showAllRobotNames(){
+		String out = "";
+		for(String n : allBotList.keySet()){
+			out = n+", "+out;
+		}
+		return out;
+	}
+
+	public int size(){
+		return allBotList.size();
+	}
 }
 
+/**
+ * THIS IS AN OBJECT TO STORE ROBOT ATTRIBUTES
+ */
 class EnemyBotRecord {
 	public String name; // bot name
 	public double life;
 	public double distance;
 	public double bearing;
-	public int dangerLevel = 0; //rank toughness of enemy bot
-	public int consecutiveScan = 0;
+	public int dangerLevel=0; //rank toughness of enemy bot
 
 	public EnemyBotRecord(String n, double l, double d, double b){
 		name = n;
 		life = l;
 		distance = d;
 		bearing = b;
-
-		// Attempt to categorize this enemy bot
-		if (life > 99){
-			dangerLevel = 3;
-		}
-		else if( life > 50 && distance < 120){
-			dangerLevel = 2;
-		}
-		else if( life < 50 || distance < 55){
-			dangerLevel = 1;
-		}
-
 	}
 
 	public void updateAll(double l, double d, double b){
 		life = l;
 		distance = d;
 		bearing = b;
+	}
+
+	// Attempt to categorize this enemy bot
+	public int getDanger(){
+		dangerLevel = 4;
+		if (life > 110){
+			dangerLevel = 1;
+		}
+		else if(life > 90){
+			dangerLevel = 2;
+		}
+		else if(life > 40){
+			dangerLevel = 3;
+		}
+		return dangerLevel;
 	}
 
 	public String toString(){

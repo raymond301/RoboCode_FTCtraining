@@ -11,106 +11,95 @@ public class Gort extends Robot
 	/**
 	 * run: Gort wants to seek out enemies and destoy them one at a time. Pretty agressive style robot.
 	 */
-	boolean keepSearching = true;
-	int pwr = 1;
 	DirectionDriveSupport driver = new DirectionDriveSupport();
-
+	int cnt = 0;
 	public void run() {
 		// Initialization of the robot
-		setAllColors(Color.blue); // body,gun,radar,bullet,scan ar
+		setAllColors(Color.blue); // body,gun,radar,bullet,scan arc
+		// How big is the field I'm on? Save it for Later.
 		driver.myField(getBattleFieldWidth(), getBattleFieldHeight());
 		System.out.println("FieldWidth: "+getBattleFieldWidth()+"  FieldHeight:"+getBattleFieldHeight());
 		driver.myPosition(getX(),getY());
-		//dynamicDrive(driver.getDirections(), driver.getDistances());
 
 		// Robot main loop
 		while(true) {
+			System.out.println("cnt="+cnt);
+			cnt++;
+			if(!driver.getShootingDesion()){
+				turnGunLeft(360);
+			}
 			driver.myPosition(getX(),getY());
 			// Visually display myself white, when I am getting low on energy
 			if(getEnergy() < 30){
 				setColors(Color.white,Color.white,Color.blue); // body,gun,radar
 			}
-			ahead(300);
-			System.out.println(driver.getLocationString());
-		}
+
+			System.out.println("While-"+driver.getLocationString());
+			System.out.println("While-"+driver.getMySeenBots());
+		}// This is the end	of while	
+
 	}
 
 	/**
 	 * onScannedRobot: What to do when you see another robot
 	 */
-	public void onScannedRobot(ScannedRobotEvent e) {
-		EnemyBotRecord ebr = new EnemyBotRecord(e.getName(),e.getEnergy(),e.getDistance(),e.getBearing());
-		out.println(ebr.toString());
-
-		// Chase them down!!
-		if(e.getDistance() > 30){
-			System.out.println("Chase Down:"+e.getDistance());
-			turnRight(e.getBearing());
-			ahead(e.getDistance() - 50);
+	public void onScannedRobot(ScannedRobotEvent e) {		
+		driver.scannedARobot(e.getName(),e.getEnergy(),e.getDistance(),e.getBearing());
+		if(driver.getDriveDesion()){
+			System.out.println("Drive In Scan.");
+			dynamicDrive();
+		}
+		if(driver.getShootingDesion()){
+			fire(1);
 		}
 		
-		if( ebr.dangerLevel == 1 ){
-			fire(4);
-			pwr = 4;
-		}
-		else if( ebr.dangerLevel == 2 ){
-			fire(2);
-		}
-		else if( ebr.dangerLevel == 3 ){
-			pwr = 1;
-		} 
-		else{
-			pwr = 0;
-		}
 	}
 
 	/**
 	 * onHitByBullet: What to do when you're hit by a bullet
 	 */
 	public void onHitByBullet(HitByBulletEvent e) {
-		// Check to see if I'm getting hit from straight on?
-		double fromDirection = e.getBearing(); 
-		if( fromDirection > -10 && fromDirection < 10 ){
-			System.out.println("Direct Front");
-			
-			driver.evadeFrontalHits(e.getName());
-			dynamicDrive(driver.getDirections(), driver.getDistances());
-		}
-		else{
-			back(10);
-		}
+		System.out.println("I've Been Hit!");	
 	}
 	
 	/**
-	 * onHitWall: What to do when you hit a wall
+	 * onHitWall: What to do when you hit a wall : want to Avoid this in the future.
 	 */
 	public void onHitWall(HitWallEvent e) {
 		// Replace the next line with any behavior you would like
-		System.out.println("Wall!");	
-		back(20);
-		turnLeft(150);
+		System.out.println("Wall!");
 	}	
 	
 	/**
 	 * onBulletHit: What to do when get hit by someone else
 	 */
 	public void onBulletHit(BulletHitEvent e){
-		System.out.println("onBulletHit!");	
-		//keepSearching=false;
+		System.out.println("Got You! " + e.getName() );	
 	}
 	
 	/**
 	 * onBulletMissed: What to do when you miss, and hit a wall instead
 	 */
 	public void onBulletMissed(BulletHitEvent e){
-		System.out.println("onBulletMissed!");	
-		keepSearching=true;
+		System.out.println("onBulletMissed!");
+		driver.turnOffShooting();
+	}
+	
+	/**
+	 * onRobotDeath: when an enemy dies
+	 */
+	public void onRobotDeath(RobotDeathEvent e){
+		driver.robotDemise(e.getName());	
 	}
 	
 	/**
 	 * dynamicDrive: accept a list of actions to take in series
 	 */
-	public void dynamicDrive(char[] directions, int[] distances){
+	public void dynamicDrive(){
+		char[] directions = driver.getDirections();
+		int[] distances = driver.getDistances();
+		
+		System.out.print("DRIVE - "+driver.getCourseComing());
 		for(int i=0; i < directions.length; i++){
 			switch(directions[i]){
 				case 'a': ahead(distances[i]);
