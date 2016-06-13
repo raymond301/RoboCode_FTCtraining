@@ -11,7 +11,7 @@ public class Gort extends Robot
 	/**
 	 * run: Gort wants to seek out enemies and destoy them one at a time. Pretty agressive style robot.
 	 */
-	DirectionDriveSupport driver = new DirectionDriveSupport();
+	GortDirectionDriveSupport driver = new GortDirectionDriveSupport();
 	int cnt = 0;
 	public void run() {
 		// Initialization of the robot

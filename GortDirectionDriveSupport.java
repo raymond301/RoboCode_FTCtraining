@@ -6,7 +6,7 @@ import java.util.Set;
 /**
  * MyClass - a class by (your name here)
  */
-public class DirectionDriveSupport
+public class GortDirectionDriveSupport
 {
 	private char[] directionArr;	
 	private int[] distanceArr;
@@ -33,7 +33,7 @@ public class DirectionDriveSupport
 	/**
 	 *  Support Constructor
 	 */
-	public DirectionDriveSupport(){
+	public GortDirectionDriveSupport(){
 		directionArr = new char[]{'a'};
 		distanceArr = new int[]{5};
 		botRecords = new RecordCollection();
