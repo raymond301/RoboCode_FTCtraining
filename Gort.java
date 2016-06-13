@@ -23,19 +23,25 @@ public class Gort extends Robot
 
 		// Robot main loop
 		while(true) {
-			System.out.println("cnt="+cnt);
+			System.out.println("Lap:"+cnt);
 			cnt++;
 			if(!driver.getShootingDesion()){
+				System.out.println("Turn Gun");
 				turnGunLeft(360);
 			}
+			else{
+				System.out.println("While-Fire!");
+				fire(1);
+			}			
+
 			driver.myPosition(getX(),getY());
 			// Visually display myself white, when I am getting low on energy
 			if(getEnergy() < 30){
 				setColors(Color.white,Color.white,Color.blue); // body,gun,radar
 			}
 
-			System.out.println("While-"+driver.getLocationString());
-			System.out.println("While-"+driver.getMySeenBots());
+			System.out.println("Shoot: "+driver.getShootingDesion()+" While-"+driver.getLocationString());
+			//System.out.println("While-"+driver.getMySeenBots());
 		}// This is the end	of while	
 
 	}
@@ -49,8 +55,10 @@ public class Gort extends Robot
 			System.out.println("Drive In Scan.");
 			dynamicDrive();
 		}
+		
 		if(driver.getShootingDesion()){
-			fire(1);
+			System.out.println("Scan-Fire!");
+			fire(2);
 		}
 		
 	}
@@ -59,6 +67,7 @@ public class Gort extends Robot
 	 * onHitByBullet: What to do when you're hit by a bullet
 	 */
 	public void onHitByBullet(HitByBulletEvent e) {
+		// Basically ignore my own damage.
 		System.out.println("I've Been Hit!");	
 	}
 	
@@ -101,6 +110,7 @@ public class Gort extends Robot
 		
 		System.out.print("DRIVE - "+driver.getCourseComing());
 		for(int i=0; i < directions.length; i++){
+			System.out.print("*"+directions[i]);
 			switch(directions[i]){
 				case 'a': ahead(distances[i]);
 				case 'b': back(distances[i]);

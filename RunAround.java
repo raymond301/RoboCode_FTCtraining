@@ -32,28 +32,34 @@ public class RunAround extends Robot
 
 		// Robot main loop
 		while(true) {
-			// Replace the next 4 lines with any behavior you would like
-			turnGunRight(360);
-			
-			ahead(moveAmount);
-			double i = (rand.nextDouble() * 15) +5;
-			turnRight(i);
-			System.out.println( "Forward: "+moveAmount+" - Turn: "+i );
-			turnGunRight(360);
-			
-			if(getOthers() < 2){
-				// Last survivors - get aggressive
-				aggressive = true;
-				setColors(Color.red,Color.white,Color.red); // body,gun,radar
-			}
+		
+			int myNum = 95;
+			int numberOne = myNum % 90;
+			int numberTwo = 90 % myNum;
+			System.out.println("myNum="+myNum+" One="+numberOne+" Two="+numberTwo);
+			myNum = 3; // reassign variable
+			int numberThree = myNum % 2;			
+			int numberFour = 2 % myNum;
+			System.out.println("myNum="+myNum+" Three="+numberThree+" Four="+numberFour);
 
-		}
+
+
+
+			turnGunRight(360);
+			ahead(moveAmount);
+		
+			if(getOthers() < 2){
+				//Turn Red if only 1 enemy remains
+				setColors(Color.red,Color.white,Color.red); // body,gun,radar
+			} // end if
+			
+		} //end while
+		
+
+
 	}
 	
 	
-	
-
-
 	/**
 	 * onScannedRobot: What to do when you see another robot
 	 */

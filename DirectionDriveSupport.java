@@ -113,13 +113,28 @@ public class DirectionDriveSupport
 
 		if(attackTarget == null){
 			attackTarget = botRecords.getBotByName(n);
+			shoot = true;
+
+			if(attackTarget.distance > 55){
+				drive = true;
+				directionArr = new char[]{'r','a'};
+				distanceArr = new int[2];
+				distanceArr[0] = (int) attackTarget.bearing;
+				distanceArr[1] = (int) attackTarget.distance - 52;
+			}
+			else{
+				drive = false;
+			}
 		}
 
 	}
 	public void robotDemise(String name){
+		if( attackTarget.name == name ){
+			attackTarget = null;
+			shoot = false;
+		}
 		botRecords.drop(name);
 	}
-
 
 	/**
 	 * Private Methods - Only available in this class
@@ -141,10 +156,12 @@ public class DirectionDriveSupport
 		return currentQuadrant;
 	}
 
+	//ignore for now
 	private EnemyBotRecord calculateTarget(){
 		if(botRecords.size() == 1){
 			return botRecords.getOne();
 		}
+		return null;
 	}
 
 }
