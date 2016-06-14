@@ -11,8 +11,8 @@ import java.util.HashMap;
 public class Robbie extends Robot
 {
 	// Data: Store the number of times other bot is scanned.
-	HashMap<String, int> allBots = new HashMap<>(); 
-
+	HashMap<String, Integer> allBots = new HashMap<>();
+	int lap = 1;
 	/**
 	 * run: Robbie's default behavior
 	 */
@@ -27,6 +27,8 @@ public class Robbie extends Robot
 			turnGunRight(360);
 			back(100);
 			turnGunRight(360);
+			System.out.println( lap + " - " + showAllRobotNames() );
+			lap++;
 		}
 	}
 
@@ -34,6 +36,13 @@ public class Robbie extends Robot
 	 * onScannedRobot: What to do when you see another robot
 	 */
 	public void onScannedRobot(ScannedRobotEvent e) {
+		Integer seenTimes = allBots.get(e.getName());
+		if ( seenTimes == null) {
+			allBots.put(e.getName(), 1);
+		}
+		else{
+			allBots.put(e.getName(), seenTimes + 1);
+		}		
 		// Replace the next line with any behavior you would like
 		fire(1);
 	}
@@ -53,4 +62,13 @@ public class Robbie extends Robot
 		// Replace the next line with any behavior you would like
 		back(20);
 	}	
+	
+	public String showAllRobotNames(){
+		String out = "";
+		for(String n : allBots.keySet()){
+			out = n+":"+allBots.get(n)+", "+out;
+		}
+		return out;
+	}
+
 }
