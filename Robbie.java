@@ -11,8 +11,12 @@ import java.util.HashMap;
 public class Robbie extends Robot
 {
 	// Data: Store the number of times other bot is scanned.
-	HashMap<String, Integer> allBots = new HashMap<>();
+	//HashMap<String, Integer> allBots = new HashMap<>();
 	int lap = 1;
+	String lastSeenBot = null;
+	int hitCnt = 0;
+	int hurtCnt = 0;	
+	int wallCnt = 0;
 	/**
 	 * run: Robbie's default behavior
 	 */
@@ -23,12 +27,33 @@ public class Robbie extends Robot
 		// Robot main loop
 		while(true) {
 			// Replace the next 4 lines with any behavior you would like
-			ahead(100);
-			turnGunRight(360);
-			back(100);
-			turnGunRight(360);
-			System.out.println( lap + " - " + showAllRobotNames() );
+			if(lastSeenBot == null){
+				if(lap % 2 == 0){
+					turnGunRight(180);
+					ahead(100);
+				} else{
+					turnGunLeft(180);
+					back(100);
+				}
+			} else {
+				turnGunRight(15);
+				turnGunLeft(30);
+				turnGunRight(15);
+				// Decide to move if I'm getting hit, and not hiting others
+				if( hurtCnt > 0 && hurtCnt > hitCnt ){
+					lastSeenBot = null;
+					hitCnt = 0;
+					hurtCnt = 0;
+				}
+			}
+				
+			System.out.println( lap + " - " + lastSeenBot );
 			lap++;
+			
+			if(getEnergy() < 40){
+				//Turn Red if only 1 enemy remains
+				setColors(Color.white,Color.white,Color.red); // body,gun,radar
+			} // end if
 		}
 	}
 
@@ -36,15 +61,26 @@ public class Robbie extends Robot
 	 * onScannedRobot: What to do when you see another robot
 	 */
 	public void onScannedRobot(ScannedRobotEvent e) {
-		Integer seenTimes = allBots.get(e.getName());
-		if ( seenTimes == null) {
-			allBots.put(e.getName(), 1);
+		System.out.println("Scan:"+e.getName());
+
+		if(lastSeenBot == null){
+			lastSeenBot = e.getName();
+			turnRight(e.getBearing());
+			if(e.getDistance() > 65){
+				ahead( e.getDistance() - 55 );
+			}
+			System.out.println("Last=Null: "+lastSeenBot+" dist="+e.getDistance());
+		} else {
+			if(lastSeenBot == e.getName()){
+				turnRight(e.getBearing());
+				if(e.getDistance() > 65){
+					ahead( e.getDistance() - 55 );
+				}
+				fire(1);
+			}
 		}
-		else{
-			allBots.put(e.getName(), seenTimes + 1);
-		}		
-		// Replace the next line with any behavior you would like
-		fire(1);
+		
+		
 	}
 
 	/**
@@ -52,23 +88,45 @@ public class Robbie extends Robot
 	 */
 	public void onHitByBullet(HitByBulletEvent e) {
 		// Replace the next line with any behavior you would like
-		back(10);
+		//back(10);
+		System.out.println("I've been Hit!");
+		hurtCnt++;
 	}
+	
+	/**
+	 * onBulletHit: What to do when get hit by someone else
+	 */
+	public void onBulletHit(BulletHitEvent e){
+		System.out.println("Got You! " + e.getName() );
+		hitCnt++;
+	}
+	
 	
 	/**
 	 * onHitWall: What to do when you hit a wall
 	 */
 	public void onHitWall(HitWallEvent e) {
 		// Replace the next line with any behavior you would like
-		back(20);
-	}	
-	
-	public String showAllRobotNames(){
-		String out = "";
-		for(String n : allBots.keySet()){
-			out = n+":"+allBots.get(n)+", "+out;
+		System.out.println("Ouch, wall!");
+		wallCnt++;
+		if( wallCnt > 1){
+			if(lap % 2 == 0){
+				ahead(30);
+			} else{
+				back(30);
+			}
+			wallCnt = 0;
 		}
-		return out;
-	}
+
+	}	
+
+	/**
+	 * onRobotDeath: What to do when someone goes bye-bye
+	 */	
+	public void onRobotDeath(RobotDeathEvent e){
+		lastSeenBot = null;
+	} 
+	
+	
 
 }
