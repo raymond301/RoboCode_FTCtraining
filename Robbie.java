@@ -2,6 +2,9 @@ package raymondBots;
 import robocode.*;
 import java.awt.Color;
 import java.util.HashMap;
+//For using Random
+import robocode.util.Utils;
+import java.util.Random;
 
 // API help : http://robocode.sourceforge.net/docs/robocode/robocode/Robot.html
 
@@ -17,23 +20,27 @@ public class Robbie extends Robot
 	int hitCnt = 0;
 	int hurtCnt = 0;	
 	int wallCnt = 0;
+	int noScans = 0;
+	int stareDown = 0;
 	/**
 	 * run: Robbie's default behavior
 	 */
 	public void run() {
 		// Initialization of the robot should be put here
 		setColors(Color.green,Color.green,Color.green); // body,gun,radar
+		Random rand = Utils.getRandom();
 
 		// Robot main loop
 		while(true) {
 			// Replace the next 4 lines with any behavior you would like
 			if(lastSeenBot == null){
+				int r = rand.nextInt(100)-50;
 				if(lap % 2 == 0){
 					turnGunRight(180);
-					ahead(100);
+					ahead(100+r);
 				} else{
-					turnGunLeft(180);
-					back(100);
+					turnGunRight(180); //the other half
+					back(100+r);
 				}
 			} else {
 				turnGunRight(15);
@@ -49,11 +56,18 @@ public class Robbie extends Robot
 				
 			System.out.println( lap + " - " + lastSeenBot );
 			lap++;
+			noScans++;
 			
+			/// What happens if I've lost too much energy?
 			if(getEnergy() < 40){
 				//Turn Red if only 1 enemy remains
 				setColors(Color.white,Color.white,Color.red); // body,gun,radar
 			} // end if
+			
+			// What happens if robots evade my scanner for too long?
+			if(noScans > 15){
+				lastSeenBot = null;
+			}
 		}
 	}
 
@@ -61,23 +75,54 @@ public class Robbie extends Robot
 	 * onScannedRobot: What to do when you see another robot
 	 */
 	public void onScannedRobot(ScannedRobotEvent e) {
-		System.out.println("Scan:"+e.getName());
-
+		System.out.println("Scan:"+e.getName()+" Br:"+e.getBearing());
+		noScans = 0;
 		if(lastSeenBot == null){
+			System.out.println("Last=Null: "+lastSeenBot+" dist="+e.getDistance());
 			lastSeenBot = e.getName();
+			System.out.println("NewBot Br:"+e.getBearing());
 			turnRight(e.getBearing());
+			if( ! Utils.isNear(getGunHeading(), getHeading()) ){
+					turnGunRight(180); //gun needs to face the same way
+				}
+
 			if(e.getDistance() > 65){
 				ahead( e.getDistance() - 55 );
 			}
-			System.out.println("Last=Null: "+lastSeenBot+" dist="+e.getDistance());
+			fire(1);
+
 		} else {
 			if(lastSeenBot == e.getName()){
-				turnRight(e.getBearing());
-				if(e.getDistance() > 65){
+				if( -5 < e.getBearing() && e.getBearing() < 5 ){
+					fire(3);
+					scan();
+				} else {
+					turnRight(e.getBearing());
+				}
+
+				if(e.getDistance() > 65){				
 					ahead( e.getDistance() - 55 );
 				}
+				
+				if( ! Utils.isNear(getGunHeading(), getHeading()) ){
+					turnGunRight(180); //gun needs to face the same way
+				}
+
 				fire(1);
+				
+			} else {
+				turnGunRight(5);
+				turnGunLeft(10);
+				turnGunRight(5);
+				stareDown++;
+				if(stareDown > 6){
+					System.out.println("Stare down reset");
+					stareDown = 0;
+					lastSeenBot = e.getName();
+				}	
+				//scan();
 			}
+			
 		}
 		
 		

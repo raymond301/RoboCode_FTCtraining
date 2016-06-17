@@ -11,7 +11,9 @@ Rank | RobotName | TotalScore | BulletDmg | 1sts | 2nds
 3rd|sample.Crazy|855 (14%)|315|0|0
 4th|raymondBots.Gort*|65 (1%)|60|0|0
 
+
  Worse than previous Record: 4% Total Score : June 13th
+ 
  Worse than previous Record: 14% Total Score : June 2nd
   
 ## Getting Started
